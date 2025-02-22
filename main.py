@@ -2,6 +2,20 @@ from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import random
 
+
+
+import base64
+from io import BytesIO
+from PIL import Image
+
+
+import os
+import base64
+from io import BytesIO
+from PIL import Image
+from flask import jsonify, request
+from datetime import datetime
+
 # Initialize Flask app
 app = Flask(__name__)
 
@@ -70,6 +84,36 @@ def take_picture(user_id):
     db.session.commit()
     
     return jsonify({"message": "Picture taken!", "pictures_taken": user.pictures_taken})
+
+
+
+
+uploads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+if not os.path.exists(uploads_dir):
+    os.makedirs(uploads_dir)
+
+# Route to upload the snapshot (image)
+@app.route('/api/upload_snapshot', methods=['POST'])
+def upload_snapshot():
+    user_id = request.json.get('user_id')
+    image_data = request.json.get('image_data')
+
+    # Decode the base64 image
+    img_data = image_data.split(",")[1]
+    img_binary = base64.b64decode(img_data)
+
+    # Save the image (you can save it as a file or in the database, here we save as a file for simplicity)
+    img = Image.open(BytesIO(img_binary))
+    
+    # Use the current timestamp to generate a unique filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    image_filename = f"snapshot_{user_id}_{timestamp}.png"
+    image_path = os.path.join(uploads_dir, image_filename)
+    
+    img.save(image_path)
+
+    return jsonify({"message": "Snapshot uploaded successfully!"}), 200
+
 
 # Initialize the database (Create tables if they don't exist)
 if __name__ == '__main__':

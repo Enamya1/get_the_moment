@@ -21,6 +21,14 @@
             <button onclick="startTakingPictures()">Start Taking Pictures</button>
         </div>
 
+        <!-- Camera section -->
+        <div id="cameraSection" style="display:none;">
+            <h2>Camera Feed</h2>
+            <video id="video" width="640" height="480" autoplay></video>
+            <button onclick="takeSnapshot()">Take Snapshot</button>
+            <canvas id="canvas" style="display:none;"></canvas>
+        </div>
+
         <!-- Section to display picture-taking options -->
         <div id="pictureSection" style="display:none;">
             <p>Take pictures within 5 minutes (limit of 10 pictures).</p>
