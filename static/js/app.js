@@ -3,9 +3,11 @@ let ipAddress = '';
 let pictureCount = 0;
 let userId = null;
 let videoStream = null;
+let max_images= 2;
 
 // Step 1: Submit Name and Get IP Address
 function submitName() {
+ 
     userName = document.getElementById('nameInput').value;
     
     if (!userName) {
@@ -88,6 +90,12 @@ function takeSnapshot() {
 
 // Step 5: Upload the snapshot to the server
 function uploadSnapshot(imageData) {
+    console.log(pictureCount)
+    if (pictureCount >= max_images) {
+        alert("You have reached the limit of "+max_images+" pictures.");
+        return;
+    }
+    
     fetch('/api/upload_snapshot', {
         method: 'POST',
         headers: {
@@ -102,6 +110,7 @@ function uploadSnapshot(imageData) {
     .then(data => {
         if (data.message === "Snapshot uploaded successfully!") {
             alert("Snapshot uploaded!");
+            pictureCount=pictureCount+1;
         } else {
             alert("Error uploading snapshot.");
         }
@@ -111,26 +120,4 @@ function uploadSnapshot(imageData) {
     });
 }
 
-// Step 6: Take Picture and Update the Database
-function takePicture() {
-    if (pictureCount >= 10) {
-        alert("You have reached the limit of 10 pictures.");
-        return;
-    }
 
-    fetch(`/api/user/${userId}/take_picture`, {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message === "Picture taken!") {
-            pictureCount++;
-            document.getElementById('pictureCount').innerText = `${pictureCount}`;
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error taking picture:', error);
-    });
-}
